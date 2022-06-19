@@ -1,48 +1,52 @@
 ---
-- name: Install the required  packages in Redhat derivatives
-  yum:
+- name: Install the required packages in Redhat derivatives
+  ansible.builtin.yum:
     name: "{{ item }}"
     state: installed
-  loop: "{{ network_pkgs }}"
+  loop: "{{ _network_pkgs }}"
   when: network_check_packages
 
 - name: Write configuration files for rhel route configuration with vlan
-  template:
+  ansible.builtin.template:
     src: "route_{{ ansible_os_family }}.j2"
     dest: "{{ net_path }}/route-{{ item.device }}"
+    mode: 0644
   loop: "{{ network_vlan_interfaces }}"
   when: network_vlan_interfaces != [] and item.route is defined
 
 - name: Write configuration files for rhel route configuration
-  template:
+  ansible.builtin.template:
     src: "route_{{ ansible_os_family }}.j2"
     dest: "{{ net_path }}/route-{{ item.device }}"
+    mode: 0644
   loop: "{{ network_ether_interfaces }}"
   when: network_ether_interfaces != [] and item.route is defined
 
 - name: Write configuration files for route configuration
-  template:
+  ansible.builtin.template:
     src: "route_{{ ansible_os_family }}.j2"
     dest: "{{ net_path }}/route-{{ item.device }}"
+    mode: 0644
   loop: "{{ network_bond_interfaces }}"
   when: network_bond_interfaces != [] and item.route is defined
 
 - name: Write configuration files for rhel route configuration
-  template:
+  ansible.builtin.template:
     src: "route_{{ ansible_os_family }}.j2"
     dest: "{{ net_path }}/route-{{ item.device }}"
+    mode: 0644
   loop: "{{ network_bridge_interfaces }}"
   when: network_bridge_interfaces != [] and item.route is defined
 
 - name: Cleanup gateway dev that does not set to the one we want
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/sysconfig/network
     regexp: "^GATEWAYDEV=(?!{{ gateway_dev }})"
     state: absent
   when: gateway_dev is defined
 
 - name: Explicitly set the gateway device
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/sysconfig/network
     line: "GATEWAYDEV={{ gateway_dev }}"
   when: gateway_dev is defined

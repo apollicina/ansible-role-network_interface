@@ -1,6 +1,5 @@
 ---
 _network_pkgs:
-  - python-selinux
   - bridge-utils
   - ifenslave
   - iproute2

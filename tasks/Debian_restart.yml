@@ -6,21 +6,20 @@
 # Tested on Debian Jessie / Ubuntu 14.04 LTS and with Ethernet, Bonding Interfaces
 
 - name: Create a restart script
-  template:
+  ansible.builtin.template:
     src: restartscript.j2
     dest: /etc/network/restart.sh
     mode: 0755
 
 # Execute configuration change
 - name: Execute Network Restart
-  shell: |
+  ansible.builtin.shell: |
     set -o pipefail
     bash /etc/network/restart.sh
-  args:
-    executable: /bin/bash
+  changed_when: false
   failed_when: false
 
 - name: Cleanup Network Restart script
-  file:
+  ansible.builtin.file:
     path: /etc/network/restart.sh
     state: absent
